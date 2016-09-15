@@ -1,5 +1,9 @@
 var express = require("express");
 var app = express();
+
+var methodOverride = require("method-override");
+app.use(methodOverride('_method'))
+
 app.set("view engine", "ejs");
 var PORT = process.env.PORT || 3000; // default port 8080
 
@@ -17,6 +21,7 @@ function generateRandomString() {
           text += possible.charAt(Math.floor(Math.random() * possible.length));
       return text;
 }
+
 
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -43,6 +48,11 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls/shortURL');
 });
 
+app.delete("/urls/:key", (req, res) => {
+  var keyToRemove = req.params.key;
+  delete urlDatabase[keyToRemove];
+  res.redirect('/urls');
+})
 
 
 app.get("/urls/shortURL", (req, res) => {
@@ -50,7 +60,6 @@ app.get("/urls/shortURL", (req, res) => {
   var shortenTheURL = Object.keys(urlDatabase)[length];
   res.render("urls_create", {shortURL: shortenTheURL});
 });
-
 
 app.get("/u/:shortURL", (req, res) => {
   var longURL = urlDatabase[req.params.shortURL];
@@ -61,6 +70,8 @@ app.get("/u/:shortURL", (req, res) => {
 //   var templateVars = { shortURL: req.params.id };
 //   res.render("urls_show", templateVars);
 // });
+
+
 
 //starts the server
 app.listen(PORT, () => {
