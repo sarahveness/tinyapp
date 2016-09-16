@@ -40,6 +40,14 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+app.get("/urls/:key/edit", (req, res) => {
+  var templateVars = {
+    longURL: urlDatabase[req.params.key],
+    key: req.params.key,
+  };
+  res.render("urls_show", templateVars);
+});
+
 //add a new short URL to the database |
 app.post("/urls", (req, res) => {
   var theShortURL = generateRandomString();
@@ -48,12 +56,16 @@ app.post("/urls", (req, res) => {
   res.redirect('/urls/shortURL');
 });
 
+app.put("/urls/:key/edit", (req, res) => {
+  urlDatabase[req.params.key] = req.body.longURL;
+  res.redirect('/urls');
+});
+
 app.delete("/urls/:key", (req, res) => {
   var keyToRemove = req.params.key;
   delete urlDatabase[keyToRemove];
   res.redirect('/urls');
-})
-
+});
 
 app.get("/urls/shortURL", (req, res) => {
   var length = Object.keys(urlDatabase).length -1;
@@ -66,10 +78,6 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// app.get("/urls/:id", (req, res) => {
-//   var templateVars = { shortURL: req.params.id };
-//   res.render("urls_show", templateVars);
-// });
 
 
 
@@ -77,29 +85,3 @@ app.get("/u/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-// // create a short URL
-// app.get("/urls/create", (req, res) => {
-//   var longURL = req.body.longURL
-//   var length = Object.keys(urlDatabase).length;
-//   var shortenTheURL = Object.keys(urlDatabase)[length];
-//   // code to generate a short url
-//   //shortURL = longURL;
-//   res.redirect("urls/", urlDatabase);
-// });
-
-
-//get the short URL and redirect to the actual URL
-// app.get("/urls/:shortURL", (req, res) => {
-//   var shortURL = userEnterURL;
-//   var longURL = req.body.shortURL;
-//   res.redirect("u/"(userEnterURL));
-
-//   var longURL = req.body.longURL
-//   var length = Object.keys(urlDatabase).length;
-//   var shortenTheURL = Object.keys(urlDatabase)[length];
-//   // code to generate a short url
-//   //shortURL = longURL;
-//   res.redirect("urls/", urlDatabase);
-// });
