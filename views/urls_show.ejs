@@ -7,10 +7,25 @@
 
   <header> <% include ../views/partials/_header %> </header>
 
+   <a href="/urls">Go back to the homepage!</a>
 
-  <% for (var key in shortURL) { %>
-  <%=shortURL[key]%>
-  <% } %>
+   <h2>ShortURL</h2>
+
+  <form method="POST" action="http://localhost:3000/urls/<%= shortURL %>?_method=PUT">
+  <input id="text" value="<%= shortURL %>" placeholder="enter your new URL here" style="width: 300px">
+  <input type="submit">Update URL</input>
+  </form>
+
+
+
+
+<!--
+    <form action="/urls" method="POST" style="margin:150px;">
+      <label for="longURL">Enter a URL:</label>
+      <input id="longURL" type="text" name="longURL" placeholder="enter your new URL here" style="width: 300px">
+      <input type="submit" value="Submit">
+    </form>
+ -->
 </body>
 
 </html>
