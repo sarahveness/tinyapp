@@ -9,12 +9,13 @@
 
    <a href="/urls">Go back to the homepage!</a>
 
-   <h2>ShortURL</h2>
+   <h2>ShortURL: <%= key %></h2>
 
-  <form method="POST" action="http://localhost:3000/urls/<%= shortURL %>?_method=PUT">
-  <input id="text" value="<%= shortURL %>" placeholder="enter your new URL here" style="width: 300px">
-  <input type="submit">Update URL</input>
-  </form>
+    <form action="/urls/<%= key %>/edit?_method=PUT" method="POST" style="margin:150px;">
+      <label for="longURL">Enter your new URL</label>
+      <input id="longURL" type="text" name="longURL" style="width: 300px" value="<%= longURL %>">
+      <input type="submit" value="Submit">
+    </form>
 
 
 

@@ -14,9 +14,14 @@
   <% for (var key in urls) { %>
   <p><ul><li><%=key%> -- <%=urls[key]%>
 
+
+
   <form method="POST" action="http://localhost:3000/urls/<%= key %>?_method=DELETE">
   <button type="submit">Delete URL</button>
   </form>
+
+<a href="/urls/<%= key %>/edit">Change URL</a>
+
 
   </li></ul>
   <% } %>
