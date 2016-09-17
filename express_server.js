@@ -29,36 +29,14 @@ function generateRandomString() {
 
 function connectAndThen(cb) {
   MongoClient.connect(MONGODB_URI, (err, db) => {
+    if (err) {
+      console.log("Could not connect to database! Unexpected error. Details below");
+      throw err;
+    }
+
     cb(err, db);
   });
 }
-
-//< ----------
-
-
-// console.log(`Connecting to MongoDB running at: ${MONGODB_URI}`);
-
-// var dbInstance;
-
-// MongoClient.connect(MONGODB_URI, (err, db) => {
-
-//   if (err) {
-//     console.log('Could not connect! Unexpected error. Details below.');
-//     throw err;
-//   }
-
-//   dbInstance = db;
-
-//   console.log('Connected to the database!');
-//   var collection = db.collection("urls");
-
-//   console.log('Retreiving documents for the "test" collection...');
-//   collection.find().toArray((err, results) => {
-//     console.log('results: ', results);
-
-
-//   });
-// });
 
 // < ------------------------- END OF DATABaSE ------------------------- >
 
@@ -74,7 +52,6 @@ function getLongURL(db, shortURL, cb) {
     return cb(null, result.longURL);
   });
 }
-
 
 // < ------------- END OF FUNCTION -------------------->
 
@@ -95,7 +72,6 @@ app.get("/urls", (req, res) => {
       res.render("urls_index", {urls: urls});
     });
   });
-  // var templateVars = { urls: urlDatabase };
 
 });
 
@@ -104,47 +80,67 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:key/edit", (req, res) => {
-  var shortURL = req.params.key;
-  var templateVars;
-  getLongURL(dbInstance, shortURL, (err, longURL) => {
-    debugger;
-        templateVars = {
-        longURL: longURL,
-        shortURL: shortURL
-      };
-  });
-  res.render("urls_show", templateVars);
-});
-
 //add a new short URL to the database |
 app.post("/urls", (req, res) => {
-  var theShortURL = generateRandomString();
-  var userEnterURL = req.body.longURL;
-  urlDatabase[theShortURL] = userEnterURL;
-  res.redirect('/urls/shortURL');
+  var newURL = {
+    shortURL: generateRandomString(),
+    longURL: req.body.longURL
+  }
+  console.log("Attemping to insert new URL: ", newURL);
+
+  connectAndThen((err, db) => {
+    db.collection('urls').insert(newURL, (err, newDocument) => {
+      if(err) res.status(500).json(err);
+      res.redirect('/urls/new');
+    })
+})
 });
+
+
+app.get("/urls/:key/edit", (req, res) => {
+  connectAndThen(function(err, db) {
+    if (err) {
+      console.log("With errors: "+err);
+    }
+    //when you're using "find" you have to use ".toArray" to get the information back.
+    db.collection("urls").findOne({shortURL: req.params.key}, (err, url) => {
+      res.render("urls_editandshow", {url: url});
+    });
+  });
+
+});
+
+
 
 app.put("/urls/:key/edit", (req, res) => {
-  urlDatabase[req.params.key] = req.body.longURL;
-  res.redirect('/urls');
+  connectAndThen(function(err, db) {
+    db.collection("urls").updateOne({shortURL: req.params.key}, {$set: {longURL: req.body.longURL}}, (err, urls) => {
+    res.redirect('/urls');
+    })
+  });
+  // res.redirect('/urls');
 });
+
 
 app.delete("/urls/:key", (req, res) => {
-  var keyToRemove = req.params.key;
-  delete urlDatabase[keyToRemove];
-  res.redirect('/urls');
+  connectAndThen(function(err, db) {
+    db.collection("urls").deleteOne({shortURL: req.params.key}, function(err) {
+      console.log(err);
+
+      res.redirect('/urls');
+    })
+  });
 });
 
-app.get("/urls/shortURL", (req, res) => {
-  var length = Object.keys(urlDatabase).length -1;
-  var shortenTheURL = Object.keys(urlDatabase)[length];
-  res.render("urls_create", {shortURL: shortenTheURL});
-});
-
+//Redirect to the actual page
 app.get("/u/:shortURL", (req, res) => {
-  var longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  connectAndThen((err, db) => {
+    //find a URL with the matching shortURL
+    db.collection('urls').findOne({shortURL: req.params.shortURL}), function(err, urls) {
+      //Redirect to the short URL
+      res.redirect('urls.longURL');
+    }
+  })
 });
 
 
@@ -152,3 +148,17 @@ app.get("/u/:shortURL", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
