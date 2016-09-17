@@ -4,6 +4,9 @@
   <body style="font-size:20px; padding:50px;">
     <% include ../views/partials/_header %>
 
+
+ <!-- form action is where it's going to go to,   -->
+
     <a href="/urls">Go back to the homepage!</a>
     <form action="/urls" method="POST" style="margin:150px;">
       <label for="longURL">Enter a URL:</label>
@@ -12,3 +15,5 @@
     </form>
   </body>
 </html>
+
+<!-- name= is what is going to be used as the property for req.params -->

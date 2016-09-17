@@ -16,11 +16,11 @@
 
 
 
-  <form method="POST" action="http://localhost:3000/urls/<%= key %>?_method=DELETE">
+  <form method="POST" action="http://localhost:3000/urls/<%= urls[key].shortURL %>?_method=DELETE">
   <button type="submit">Delete URL</button>
   </form>
 
-<a href="/urls/<%= key %>/edit">Change URL</a>
+<a href="/urls/<%= urls[key].shortURL %>/edit">Change URL</a>
 
 
   </li></ul>
