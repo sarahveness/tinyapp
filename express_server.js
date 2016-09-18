@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var express = require("express");
 var app = express();
 
@@ -13,7 +15,7 @@ app.use(bodyParser.urlencoded());
 app.use(express.static('public'));
 
 const MongoClient = require("mongodb").MongoClient;
-const MONGODB_URI = "mongodb://127.0.0.1:27017/url_shortener";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // < ------------------ GENERATE SHORT URL FUNCTION BELOW ------------------ >
 
