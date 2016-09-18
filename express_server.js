@@ -70,7 +70,7 @@ app.get("/urls", (req, res) => {
     }
     db.collection("urls").find().toArray((err, urls) => {
       res.render("urls_index", {urls: urls});
-    });
+    })
   });
 
 });
@@ -89,9 +89,9 @@ app.post("/urls", (req, res) => {
   console.log("Attemping to insert new URL: ", newURL);
 
   connectAndThen((err, db) => {
-    db.collection('urls').insert(newURL, (err, newDocument) => {
+    db.collection('urls').insert(newURL, (err, url) => {
       if(err) res.status(500).json(err);
-      res.redirect('/urls/new');
+      res.render("urls_created", {url: newURL.longURL});
     })
 })
 });
@@ -105,7 +105,7 @@ app.get("/urls/:key/edit", (req, res) => {
     //when you're using "find" you have to use ".toArray" to get the information back.
     db.collection("urls").findOne({shortURL: req.params.key}, (err, url) => {
       res.render("urls_editandshow", {url: url});
-    });
+    })
   });
 
 });
@@ -118,15 +118,12 @@ app.put("/urls/:key/edit", (req, res) => {
     res.redirect('/urls');
     })
   });
-  // res.redirect('/urls');
 });
 
 
 app.delete("/urls/:key", (req, res) => {
   connectAndThen(function(err, db) {
     db.collection("urls").deleteOne({shortURL: req.params.key}, function(err) {
-      console.log(err);
-
       res.redirect('/urls');
     })
   });
@@ -134,12 +131,13 @@ app.delete("/urls/:key", (req, res) => {
 
 //Redirect to the actual page
 app.get("/u/:shortURL", (req, res) => {
+  // var longURL =
   connectAndThen((err, db) => {
     //find a URL with the matching shortURL
-    db.collection('urls').findOne({shortURL: req.params.shortURL}), function(err, urls) {
+    db.collection('urls').findOne({shortURL: req.params.shortURL}, function(err, url) {
       //Redirect to the short URL
-      res.redirect('urls.longURL');
-    }
+      res.redirect(url);
+    })
   })
 });
 
