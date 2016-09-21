@@ -76,7 +76,7 @@ app.get("/", (req, res) => {
       console.log("With errors: "+err);
     }
     db.collection("urls").find().toArray((err, urls) => {
-      res.render("urls_index", {urls: urls});
+      res.render("urls_new", {urls: urls});
     })
   });
 });
@@ -99,7 +99,7 @@ app.post("/urls", (req, res) => {
   connectAndThen((err, db) => {
     db.collection('urls').insert(newURL, (err, url) => {
       if(err) res.status(500).json(err);
-      res.render("urls_created", {url: newURL.longURL});
+      res.render("urls_created", {url: newURL});
     })
 })
 });
