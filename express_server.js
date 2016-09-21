@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded());
 app.use(express.static('public'));
 
 const MongoClient = require("mongodb").MongoClient;
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = "mongodb://127.0.0.1:27017/url_shortener";
 
 // < ------------------ GENERATE SHORT URL FUNCTION BELOW ------------------ >
 
@@ -58,12 +58,6 @@ function getLongURL(db, shortURL, cb) {
 // < ------------- END OF FUNCTION -------------------->
 
 
-var urlDatabase = {
-  "AAAAAA": "http://www.neopets.com",
-  "BBBBBB": "http://www.IHATETHIS.com",
-};
-
-
 //first page : localhost:3000/urls | show me the urls_index view
 app.get("/urls", (req, res) => {
   connectAndThen(function(err, db) {
@@ -74,13 +68,25 @@ app.get("/urls", (req, res) => {
       res.render("urls_index", {urls: urls});
     })
   });
+});
 
+app.get("/", (req, res) => {
+  connectAndThen(function(err, db) {
+    if (err) {
+      console.log("With errors: "+err);
+    }
+    db.collection("urls").find().toArray((err, urls) => {
+      res.render("urls_index", {urls: urls});
+    })
+  });
 });
 
 //get a page to create a new short url | show me the urls_new page with the form
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
+
+
 
 //add a new short URL to the database |
 app.post("/urls", (req, res) => {
@@ -138,7 +144,7 @@ app.get("/u/:shortURL", (req, res) => {
     //find a URL with the matching shortURL
     db.collection('urls').findOne({shortURL: req.params.shortURL}, function(err, url) {
       //Redirect to the short URL
-      res.redirect(url);
+      res.redirect(url.longURL);
     })
   })
 });
